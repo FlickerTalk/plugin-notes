@@ -1,0 +1,17 @@
+{
+  "id": "com.flickertalk.notes",
+  "name": "Notes",
+  "version": "1.0.0",
+  "minCoreVersion": "1.1.0",
+  "components": [
+    "ft-notes"
+  ],
+  "permissions": {
+    "messages": "given",
+    "remind": true
+  },
+  "opens": [
+    "text/plain"
+  ],
+  "summary": "Personal notes with a reminder, kept on this phone only."
+}
