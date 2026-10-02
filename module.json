@@ -1,7 +1,7 @@
 {
   "id": "com.flickertalk.notes",
   "name": "Notes",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minCoreVersion": "1.1.0",
   "components": [
     "ft-notes"
@@ -13,5 +13,87 @@
   "opens": [
     "text/plain"
   ],
-  "summary": "Personal notes with a reminder, kept on this phone only."
+  "summary": "Personal notes with a reminder, kept on this phone only.",
+  "locales": {
+    "es": {
+      "name": "Notas",
+      "summary": "Notas personales con aviso, guardadas solo en este teléfono."
+    },
+    "pt": {
+      "name": "Notas",
+      "summary": "Notas pessoais com lembrete, guardadas só neste telefone."
+    },
+    "fr": {
+      "name": "Notes",
+      "summary": "Des notes personnelles avec rappel, gardées uniquement sur ce téléphone."
+    },
+    "de": {
+      "name": "Notizen",
+      "summary": "Persönliche Notizen mit Erinnerung, nur auf diesem Telefon gespeichert."
+    },
+    "it": {
+      "name": "Note",
+      "summary": "Note personali con promemoria, conservate solo su questo telefono."
+    },
+    "ro": {
+      "name": "Notițe",
+      "summary": "Notițe personale cu memento, păstrate doar pe acest telefon."
+    },
+    "ru": {
+      "name": "Заметки",
+      "summary": "Личные заметки с напоминанием, хранятся только на этом телефоне."
+    },
+    "uk": {
+      "name": "Нотатки",
+      "summary": "Особисті нотатки з нагадуванням, зберігаються лише на цьому телефоні."
+    },
+    "pl": {
+      "name": "Notatki",
+      "summary": "Osobiste notatki z przypomnieniem, zapisane tylko na tym telefonie."
+    },
+    "tr": {
+      "name": "Notlar",
+      "summary": "Hatırlatıcılı kişisel notlar, yalnızca bu telefonda saklanır."
+    },
+    "ar": {
+      "name": "ملاحظات",
+      "summary": "ملاحظات شخصية مع تذكير، محفوظة على هذا الهاتف فقط."
+    },
+    "hi": {
+      "name": "नोट्स",
+      "summary": "रिमाइंडर के साथ निजी नोट्स, सिर्फ़ इसी फ़ोन पर रखे जाते हैं।"
+    },
+    "bn": {
+      "name": "নোট",
+      "summary": "রিমাইন্ডারসহ ব্যক্তিগত নোট, শুধু এই ফোনেই রাখা থাকে।"
+    },
+    "id": {
+      "name": "Catatan",
+      "summary": "Catatan pribadi dengan pengingat, hanya tersimpan di ponsel ini."
+    },
+    "vi": {
+      "name": "Ghi chú",
+      "summary": "Ghi chú cá nhân có lời nhắc, chỉ được lưu trên điện thoại này."
+    },
+    "th": {
+      "name": "โน้ต",
+      "summary": "โน้ตส่วนตัวพร้อมการเตือน เก็บไว้ในโทรศัพท์เครื่องนี้เท่านั้น"
+    },
+    "ja": {
+      "name": "メモ",
+      "summary": "リマインダー付きの個人用メモ。この端末にだけ保存されます。"
+    },
+    "ko": {
+      "name": "메모",
+      "summary": "알림이 있는 개인 메모로, 이 휴대폰에만 저장됩니다."
+    },
+    "zh-CN": {
+      "name": "笔记",
+      "summary": "带提醒的个人笔记，只保存在这部手机上。"
+    },
+    "zh-TW": {
+      "name": "筆記",
+      "summary": "附提醒的個人筆記，只保存在這支手機上。"
+    }
+  }
 }

@@ -1,5 +1,8 @@
 // The plugin's own tests (Plan §53, plan-notes §6): the model of a note, the order of the list,
 // the search, and the flow of a reminder against a fake core.
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   PREFIX,
@@ -119,6 +122,34 @@ describe("the catalogue", () => {
     expect(t("pt-BR", "save")).toBe("Guardar");
     expect(t("xx", "save")).toBe("Save");
     expect(t("es", "no-such-key")).toBe("no-such-key");
+  });
+});
+
+describe("the manifest", () => {
+  // The 20 languages of the app besides English, in which the catalogue shows the plugin's name
+  // and summary (plugin-sdk, `locales` in module.schema.json).
+  const LOCALES = ["es", "pt", "fr", "de", "it", "ro", "ru", "uk", "pl", "tr", "ar", "hi", "bn", "id", "vi", "th", "ja", "ko", "zh-CN", "zh-TW"];
+  const manifest = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "module.json"), "utf8"));
+  const codePoints = (text) => [...text].length;
+
+  it("names and sums up the plugin in the 20 other languages of the app, within the SDK's limits", () => {
+    expect(Object.keys(manifest.locales ?? {})).toEqual(LOCALES);
+    for (const lang of LOCALES) {
+      const { name, summary } = manifest.locales[lang];
+      expect(summary, lang).toBeTypeOf("string");
+      expect(codePoints(summary.trim()), lang).toBeGreaterThan(0);
+      expect(codePoints(summary), lang).toBeLessThanOrEqual(200);
+      expect(name, lang).toBeTypeOf("string");
+      expect(codePoints(name.trim()), lang).toBeGreaterThan(0);
+      expect(codePoints(name), lang).toBeLessThanOrEqual(64);
+    }
+  });
+
+  it("calls the plugin in each language what the plugin calls itself", () => {
+    for (const lang of LOCALES) {
+      expect(LANGUAGES, lang).toContain(lang);
+      expect(manifest.locales?.[lang]?.name, lang).toBe(catalogueOf(lang).title);
+    }
   });
 });
 
