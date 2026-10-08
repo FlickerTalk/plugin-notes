@@ -1,7 +1,8 @@
 {
   "id": "com.flickertalk.notes",
   "name": "Notes",
-  "version": "1.0.1",
+  "version": "1.0.2",
+  "icon": "reader-outline",
   "minCoreVersion": "1.1.0",
   "components": [
     "ft-notes"
