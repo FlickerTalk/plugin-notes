@@ -25,8 +25,15 @@ contacto y solo recibe el texto que **el usuario** le da con un gesto (`messages
 | `ft.openChat`    | volver a la conversación de la que nació la nota (`ref`)         |
 | `onOpen`         | `text` + `ref` desde un mensaje; `reminder` cuando se toca el aviso; `lang` |
 
-Necesita el núcleo **1.1.0** (`minCoreVersion`). El contrato está en
+Necesita el núcleo **1.6.0** (`minCoreVersion`). El contrato está en
 [plugin-sdk](https://github.com/FlickerTalk/plugin-sdk).
+
+Desde la 1.0.3 la ventana va en los envoltorios de Ionic que la app presta al marco (barra en
+`ion-header > ion-toolbar`, cuerpo en `ion-content`, botones de Ionic, el ajuste de la pantalla de
+bloqueo con `ion-toggle` y borrar con `ion-alert`, porque `confirm()` no responde en el marco), así
+que se ve como el resto de FlickerTalk. Sin ✕ propia: la tiene la ventana de la app. El paquete no
+lleva Ionic: `@ionic/core` es solo `devDependency`, para que los tests pinten lo mismo que el
+teléfono.
 
 ## Desarrollo
 

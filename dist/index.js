@@ -124,53 +124,61 @@ export function proposedReminder(now = Date.now()) {
 const escape = (text) =>
   String(text).replace(/[&<>"']/g, (one) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[one]);
 
+// Ionic draws the window (the app lends it to the frame, app 1.6.0): header, toolbar, buttons, the
+// switch and the scrolling content. This is only what is the notes' own, with the app's colours
+// through Ionic's variables.
 const STYLE = `
-:host { display: block; font: 15px system-ui, sans-serif; color: #111; --ink: #111; --paper: #fff; --line: #d8d8d8; --soft: #666; --accent: #e0562b; }
-@media (prefers-color-scheme: dark) { :host { color: #f4f4f4; --ink: #f4f4f4; --paper: #111; --line: #3a3a3a; --soft: #aaa; } }
-:host-context([data-dark]) { color: #f4f4f4; --ink: #f4f4f4; --paper: #111; --line: #3a3a3a; --soft: #aaa; }
-* { box-sizing: border-box; }
-.bar { display: flex; gap: 6px; align-items: center; padding: 4px 0 10px; }
-.grow { flex: 1; }
-button {
+ft-notes { display: flex; flex-direction: column; height: 100%; font: 15px system-ui, sans-serif; color: var(--ion-text-color, #111); --ink: var(--ion-text-color, #111); --paper: var(--ion-background-color, #fff); --line: var(--ion-border-color, #d8d8d8); --soft: var(--ion-color-medium, #666); --accent: var(--ion-color-danger, #e0562b); }
+@media (prefers-color-scheme: dark) { ft-notes { color: var(--ion-text-color, #f4f4f4); --ink: var(--ion-text-color, #f4f4f4); --paper: var(--ion-background-color, #111); --line: var(--ion-border-color, #3a3a3a); --soft: var(--ion-color-medium, #aaa); } }
+[data-dark] ft-notes { color: var(--ion-text-color, #f4f4f4); --ink: var(--ion-text-color, #f4f4f4); --paper: var(--ion-background-color, #111); --line: var(--ion-border-color, #3a3a3a); --soft: var(--ion-color-medium, #aaa); }
+ft-notes * { box-sizing: border-box; }
+ft-notes ion-content { flex: 1; }
+ft-notes .view { padding: 8px 8px 16px; }
+ft-notes button {
   appearance: none; border: 1px solid currentColor; background: transparent; color: inherit;
   border-radius: 10px; min-width: 44px; height: 40px; font: inherit; padding: 0 10px; cursor: pointer; opacity: .8;
 }
-button.on { opacity: 1; box-shadow: inset 0 0 0 2px currentColor; }
-button.text { min-width: 0; }
-button.danger { color: var(--accent); }
-.i {
+ft-notes .i {
   display: block; width: 22px; height: 22px; margin: auto; background: currentColor;
   -webkit-mask: var(--i) center/contain no-repeat; mask: var(--i) center/contain no-repeat;
 }
-.i.small { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; margin: 0 4px 0 0; }
-input, textarea {
+ft-notes .i.small { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; margin: 0 4px 0 0; }
+ft-notes ion-button .i[slot="start"] { margin-inline-end: 6px; }
+ft-notes ion-button .i[slot="end"] { margin-inline-start: 6px; }
+ft-notes input, ft-notes textarea {
   font: inherit; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: 10px;
   padding: 8px 10px; width: 100%;
 }
-input[type="search"] { height: 40px; }
-textarea { min-height: 40vh; resize: vertical; line-height: 1.4; }
-ul { list-style: none; margin: 0; padding: 0; }
-li { border-bottom: 1px solid var(--line); }
-li button { display: block; width: 100%; text-align: start; border: 0; border-radius: 0; height: auto; padding: 10px 4px; opacity: 1; }
-.title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.meta { color: var(--soft); font-size: 13px; margin-top: 2px; display: flex; gap: 10px; }
-.meta.overdue { color: var(--accent); }
-.empty { color: var(--soft); text-align: center; padding: 40px 0; }
-.row { display: flex; gap: 8px; align-items: center; margin: 10px 0; flex-wrap: wrap; }
-.hint { color: var(--soft); font-size: 13px; margin: 4px 0 0; }
-.warn { color: var(--accent); margin: 8px 0; }
-label.switch { display: flex; gap: 10px; align-items: center; }
-label.switch input { width: auto; }
+ft-notes input[type="search"] { height: 40px; }
+ft-notes ion-toolbar input[type="search"] { display: block; margin-inline-start: 8px; }
+ft-notes textarea { min-height: 40vh; resize: vertical; line-height: 1.4; }
+ft-notes ul { list-style: none; margin: 0; padding: 0; }
+ft-notes li { border-bottom: 1px solid var(--line); }
+ft-notes li button { display: block; width: 100%; text-align: start; border: 0; border-radius: 0; height: auto; padding: 10px 4px; opacity: 1; }
+ft-notes .title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+ft-notes .meta { color: var(--soft); font-size: 13px; margin-top: 2px; display: flex; gap: 10px; }
+ft-notes .meta.overdue { color: var(--accent); }
+ft-notes .empty { color: var(--soft); text-align: center; padding: 40px 0; }
+ft-notes .row { display: flex; gap: 8px; align-items: center; margin: 10px 0; flex-wrap: wrap; }
+ft-notes .hint { color: var(--soft); font-size: 13px; margin: 4px 0 0; }
+ft-notes .warn { color: var(--accent); margin: 8px 0; }
 `;
 
-const icon = (name) => `<i class="i" style="--i:url(./icon/${name}.svg)"></i>`;
-const smallIcon = (name) => `<i class="i small" style="--i:url(./icon/${name}.svg)"></i>`;
+/** An Ionicon in a button: Ionic's own `ion-icon` when the app lent it by name, else the one the
+ *  app serves at `./icon/<name>.svg`, painted in the button's colour. */
+const icon = (name, slot = "icon-only") =>
+  globalThis.Ionicons?.map?.has(name)
+    ? `<ion-icon slot="${slot}" name="${name}" aria-hidden="true"></ion-icon>`
+    : `<i slot="${slot}" class="i" style="--i:url(./icon/${name}.svg)" aria-hidden="true"></i>`;
+const smallIcon = (name) => `<i class="i small" style="--i:url(./icon/${name}.svg)" aria-hidden="true"></i>`;
+/** An Ionic button with an icon only. */
+const button = (act, label, name, extra = "") =>
+  `<ion-button ${/\bfill=/.test(extra) ? "" : 'fill="clear"'} data-act="${act}" aria-label="${escape(label)}" ${extra}>${icon(name)}</ion-button>`;
 
 /** The plugin's view: a list of notes, one note, or the settings. */
 class Notes extends HTMLElement {
   constructor() {
     super();
-    this.root = this.attachShadow({ mode: "open" });
     this.lang = "en";
     this.notes = [];
     this.query = "";
@@ -183,11 +191,13 @@ class Notes extends HTMLElement {
   }
 
   connectedCallback() {
-    this.root.innerHTML = `<style>${STYLE}</style><div class="view"></div>`;
-    this.view = this.root.querySelector(".view");
-    this.root.addEventListener("click", (event) => this.onClick(event));
-    this.root.addEventListener("input", (event) => this.onInput(event));
-    this.root.addEventListener("change", (event) => this.onChange(event));
+    // In the page, not in a shadow root: the frame holds only this plugin, and Ionic's global
+    // styles do not cross a shadow boundary. Each screen is its own header and content.
+    this.view = this;
+    this.addEventListener("click", (event) => this.onClick(event));
+    this.addEventListener("input", (event) => this.onInput(event));
+    this.addEventListener("change", (event) => this.onChange(event));
+    this.addEventListener("ionChange", (event) => this.onChange(event));
     globalThis.ft?.onOpen?.((opening) => this.onOpen(opening));
     this.paint();
   }
@@ -245,7 +255,7 @@ class Notes extends HTMLElement {
   }
 
   async onClick(event) {
-    const button = event.target.closest("button");
+    const button = event.target.closest("button, ion-button");
     if (!button) return;
     const { act, id } = button.dataset;
     if (act === "open") {
@@ -256,7 +266,6 @@ class Notes extends HTMLElement {
       this.screen = "settings";
       this.paint();
     } else if (act === "back") this.list();
-    else if (act === "close") globalThis.ft.close();
     else if (act === "save") await this.save();
     else if (act === "delete") await this.remove();
     else if (act === "remind") await this.remind(proposedReminder());
@@ -285,8 +294,8 @@ class Notes extends HTMLElement {
     if (field.name === "remindAt" && this.current) {
       const at = fromLocalInput(field.value);
       if (at !== null) await this.remind(at);
-    } else if (field.name === "showText") {
-      this.showText = field.checked;
+    } else if (field.getAttribute?.("name") === "showText") {
+      this.showText = Boolean(event.detail?.checked ?? field.checked);
       await globalThis.ft.store.set("showText", this.showText ? "1" : "0");
       // What the lock screen shows changes for every reminder still to come.
       for (const note of this.notes) {
@@ -312,11 +321,27 @@ class Notes extends HTMLElement {
   async remove() {
     const note = this.current;
     if (!note) return;
-    if (this.notes.some((one) => one.id === note.id) && !confirm(t(this.lang, "confirmDelete"))) return;
+    if (this.notes.some((one) => one.id === note.id) && !(await this.sure())) return;
     if (typeof note.remindAt === "number") await globalThis.ft.remind.cancel(note.id);
     await globalThis.ft.records.forget(noteKey(note.id));
     this.notes = this.notes.filter((one) => one.id !== note.id);
     this.list();
+  }
+
+  /** Asks once, in the app's Ionic alert: the frame has no browser dialogs. */
+  async sure() {
+    const alerts = globalThis.ftIonic?.alertController;
+    if (!alerts) return false;
+    const T = (key) => t(this.lang, key);
+    const alert = await alerts.create({
+      message: T("confirmDelete"),
+      buttons: [
+        { text: T("back"), role: "cancel" },
+        { text: T("delete"), role: "destructive" },
+      ],
+    });
+    await alert.present();
+    return (await alert.onDidDismiss()).role === "destructive";
   }
 
   /** Sets the note's reminder at `at`, or takes it away with null. The note is kept with it. */
@@ -366,21 +391,23 @@ class Notes extends HTMLElement {
       })
       .join("");
     const empty = this.notes.length ? T("noMatch") : T("empty");
-    const list = this.root.querySelector("ul, .empty");
+    const list = this.querySelector("ul, .empty");
     const body = rows ? `<ul>${rows}</ul>` : `<p class="empty">${escape(empty)}</p>`;
     if (list && this.screen === "list" && this.paintedLang === this.lang && this.view.querySelector('input[name="query"]')) {
       list.outerHTML = body;
       return;
     }
     this.paintedLang = this.lang;
-    this.view.innerHTML = `
-      <div class="bar">
-        <button data-act="close" aria-label="${escape(T("close"))}">${icon("close-outline")}</button>
+    // No ✕: the name and the way out are the app's tool window.
+    this.view.innerHTML = `<style>${STYLE}</style>
+      <ion-header><ion-toolbar>
         <input type="search" name="query" placeholder="${escape(T("search"))}" aria-label="${escape(T("search"))}" value="${escape(this.query)}">
-        <button data-act="settings" aria-label="${escape(T("settings"))}">${icon("options-outline")}</button>
-        <button data-act="new" class="on" aria-label="${escape(T("newNote"))}">${icon("add-outline")}</button>
-      </div>
-      ${body}`;
+        <ion-buttons slot="end">
+          ${button("settings", T("settings"), "options-outline")}
+          ${button("new", T("newNote"), "add-outline", 'fill="solid"')}
+        </ion-buttons>
+      </ion-toolbar></ion-header>
+      <ion-content><div class="view">${body}</div></ion-content>`;
   }
 
   paintNote() {
@@ -389,43 +416,44 @@ class Notes extends HTMLElement {
     const state = reminderState(note);
     const reminder =
       state === "none"
-        ? `<button data-act="remind" class="text">${icon("alarm-outline")}</button><span class="hint">${escape(T("remind"))}</span>`
+        ? `${button("remind", T("remind"), "alarm-outline", 'fill="outline"')}<span class="hint">${escape(T("remind"))}</span>`
         : `<span>${escape(T("reminder"))}</span>
            <input type="datetime-local" name="remindAt" value="${toLocalInput(note.remindAt)}" aria-label="${escape(T("reminder"))}" style="width:auto">
            ${state === "overdue" ? `<span class="warn">${escape(T("overdue"))}</span>` : ""}
-           <button data-act="unremind" aria-label="${escape(T("cancelReminder"))}">${icon("remove-outline")}</button>`;
+           ${button("unremind", T("cancelReminder"), "remove-outline", 'fill="outline"')}`;
     const chat = note.ref
       ? this.chatGone
         ? `<p class="hint">${escape(T("chatGone"))}</p>`
-        : `<button data-act="chat" class="text">${smallIcon("chatbubble-outline")}${escape(T("goToChat"))}</button>`
+        : `<ion-button fill="outline" data-act="chat">${icon("chatbubble-outline", "start")}${escape(T("goToChat"))}</ion-button>`
       : "";
-    this.view.innerHTML = `
-      <div class="bar">
-        <button data-act="back" aria-label="${escape(T("back"))}">${icon("arrow-back-outline")}</button>
-        <span class="grow"></span>
-        <button data-act="delete" class="danger" aria-label="${escape(T("delete"))}">${icon("trash-outline")}</button>
-        <button data-act="save" class="on" aria-label="${escape(T("save"))}">${icon("checkmark-outline")}</button>
-      </div>
+    this.view.innerHTML = `<style>${STYLE}</style>
+      <ion-header><ion-toolbar>
+        <ion-buttons slot="start">${button("back", T("back"), "arrow-back-outline")}</ion-buttons>
+        <ion-buttons slot="end">
+          ${button("delete", T("delete"), "trash-outline", 'color="danger"')}
+          ${button("save", T("save"), "checkmark-outline", 'fill="solid"')}
+        </ion-buttons>
+      </ion-toolbar></ion-header>
+      <ion-content><div class="view">
       <textarea name="text" placeholder="${escape(T("placeholder"))}" aria-label="${escape(T("placeholder"))}">${escape(note.text)}</textarea>
       <div class="row">${reminder}</div>
       ${this.warning ? `<p class="warn">${escape(this.warning)}</p>` : ""}
-      <div class="row">${chat}</div>`;
+      <div class="row">${chat}</div>
+      </div></ion-content>`;
     const area = this.view.querySelector("textarea");
     if (area && !note.text) area.focus?.();
   }
 
   paintSettings() {
     const T = (key) => t(this.lang, key);
-    this.view.innerHTML = `
-      <div class="bar">
-        <button data-act="back" aria-label="${escape(T("back"))}">${icon("arrow-back-outline")}</button>
-        <span class="grow"></span>
-      </div>
-      <label class="switch">
-        <input type="checkbox" name="showText" ${this.showText ? "checked" : ""}>
-        <span>${escape(T("lockScreen"))}</span>
-      </label>
-      <p class="hint">${escape(T("lockScreenHint"))}</p>`;
+    this.view.innerHTML = `<style>${STYLE}</style>
+      <ion-header><ion-toolbar>
+        <ion-buttons slot="start">${button("back", T("back"), "arrow-back-outline")}</ion-buttons>
+      </ion-toolbar></ion-header>
+      <ion-content><div class="view">
+      <ion-toggle name="showText" justify="space-between" ${this.showText ? "checked" : ""}>${escape(T("lockScreen"))}</ion-toggle>
+      <p class="hint">${escape(T("lockScreenHint"))}</p>
+      </div></ion-content>`;
   }
 }
 
