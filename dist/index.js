@@ -143,6 +143,8 @@ ft-notes .i {
   -webkit-mask: var(--i) center/contain no-repeat; mask: var(--i) center/contain no-repeat;
 }
 ft-notes .i.small { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; margin: 0 4px 0 0; }
+ft-notes ion-button .i[slot="start"] { margin-inline-end: 6px; }
+ft-notes ion-button .i[slot="end"] { margin-inline-start: 6px; }
 ft-notes input, ft-notes textarea {
   font: inherit; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: 10px;
   padding: 8px 10px; width: 100%;
