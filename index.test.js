@@ -1,9 +1,9 @@
 // The plugin's own tests (Plan §53, plan-notes §6): the model of a note, the order of the list,
 // the search, and the flow of a reminder against a fake core.
-import { readFileSync, existsSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   PREFIX,
   fromLocalInput,
@@ -193,17 +193,37 @@ const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 describe("the plugin", () => {
   let core;
   let element;
-  const inside = () => element.shadowRoot;
+  afterEach(async () => {
+    for (const alert of document.querySelectorAll("ion-alert")) await alert.dismiss();
+    delete globalThis.confirm;
+    delete globalThis.Ionicons;
+  });
+  // In the page, not in a shadow root: Ionic's global styles do not cross a shadow boundary.
+  const inside = () => element;
   const press = async (act) => {
     inside().querySelector(`[data-act="${act}"]`).click();
     await tick();
     await tick();
   };
+  // Ionic moves a button's label to the native button inside it once it has drawn.
+  const label = (one) => one?.getAttribute("aria-label") ?? one?.shadowRoot?.querySelector("button")?.getAttribute("aria-label") ?? null;
+  /** The app's Ionic alert, answered as a tap on one of its buttons would. */
+  const answer = async (role) => {
+    let alert = null;
+    for (let wait = 0; wait < 50 && !(alert = document.querySelector("ion-alert")); wait += 1) await tick();
+    if (!alert) throw new Error("no alert");
+    await alert.dismiss(undefined, role);
+    for (let wait = 0; wait < 6; wait += 1) await tick();
+    return alert;
+  };
 
   beforeEach(async () => {
     core = fakeCore();
     globalThis.ft = core.ft;
-    globalThis.confirm = () => true;
+    // The frame has no browser dialogs: confirm() answers nothing there.
+    globalThis.confirm = () => {
+      throw new Error("no browser dialogs in the frame");
+    };
     document.body.innerHTML = "";
     element = document.createElement("ft-notes");
     document.body.append(element);
@@ -228,7 +248,7 @@ describe("the plugin", () => {
     await core.open({ lang: "es" });
     const titles = () => [...inside().querySelectorAll(".title")].map((one) => one.textContent.trim());
     expect(titles()).toEqual(["with alarm", "newest", "old one"]);
-    expect(inside().querySelector('[data-act="new"]').getAttribute("aria-label")).toBe("Nota nueva");
+    expect(label(inside().querySelector('[data-act="new"]'))).toBe("Nota nueva");
     const search = inside().querySelector('input[name="query"]');
     search.value = "old";
     search.dispatchEvent(new Event("input", { bubbles: true }));
@@ -252,6 +272,10 @@ describe("the plugin", () => {
 
     await press("open");
     await press("delete");
+    expect((await answer("cancel")).message).toBe("Delete this note? It is gone for good.");
+    expect(core.records.size).toBe(1);
+    await press("delete");
+    await answer("destructive");
     expect(core.ft.remind.cancel).toHaveBeenCalledWith(id);
     expect(core.records.size).toBe(0);
     expect(inside().textContent).toContain("No notes yet");
@@ -261,9 +285,12 @@ describe("the plugin", () => {
     core.records.set("note/a", JSON.stringify({ id: "a", text: "Secret plan", updatedAt: 1, remindAt: Date.now() + 100_000 }));
     await core.open({});
     await press("settings");
-    const toggle = inside().querySelector('input[name="showText"]');
+    const toggle = inside().querySelector('ion-toggle[name="showText"]');
+    expect(toggle.checked).toBe(false);
+    expect(toggle.textContent).toBe("Show the note's text in the notification");
+    // What Ionic's toggle says when the user turns it on.
     toggle.checked = true;
-    toggle.dispatchEvent(new Event("change", { bubbles: true }));
+    toggle.dispatchEvent(new CustomEvent("ionChange", { bubbles: true, detail: { checked: true } }));
     await tick();
     await tick();
     expect(core.reminders.get("a").text).toBe("Secret plan");
@@ -283,13 +310,67 @@ describe("the plugin", () => {
     expect(inside().querySelector("textarea").value).toHaveLength(20_000);
   });
 
-  it("does not keep an empty new note and closes when asked", async () => {
+  it("does not keep an empty new note", async () => {
     await core.open({});
     await press("new");
     await press("save");
     expect(core.records.size).toBe(0);
-    await press("close");
-    expect(core.ft.close).toHaveBeenCalled();
+  });
+
+  it("asks for an app that lends Ionic", () => {
+    expect(JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), "module.json"), "utf8")).minCoreVersion).toBe("1.6.0");
+  });
+
+  it("draws in the page, each screen in Ionic's header and content, with no close of its own", async () => {
+    await core.open({});
+    expect(element.shadowRoot).toBe(null);
+    const toolbar = element.querySelector(":scope > ion-header > ion-toolbar");
+    expect(toolbar.querySelector('input[name="query"]')).not.toBeNull();
+    for (const act of ["settings", "new"]) expect(label(toolbar.querySelector(`ion-button[data-act="${act}"]`)), act).toBeTruthy();
+    expect(toolbar.querySelector('ion-button[data-act="new"]').getAttribute("fill")).toBe("solid");
+    expect(element.querySelector(":scope > ion-content .empty")).not.toBeNull();
+    expect(element.querySelector('[data-act="close"]')).toBeNull();
+
+    await press("new");
+    const bar = element.querySelector(":scope > ion-header > ion-toolbar");
+    for (const act of ["back", "delete", "save"]) expect(label(bar.querySelector(`ion-button[data-act="${act}"]`)), act).toBeTruthy();
+    expect(bar.querySelector('ion-button[data-act="delete"]').getAttribute("color")).toBe("danger");
+    expect(element.querySelector(":scope > ion-content textarea")).not.toBeNull();
+    expect(element.querySelector('ion-content ion-button[data-act="remind"]')).not.toBeNull();
+
+    await press("back");
+    await press("settings");
+    expect(element.querySelector(':scope > ion-header ion-button[data-act="back"]')).not.toBeNull();
+    expect(element.querySelector(':scope > ion-content ion-toggle[name="showText"]')).not.toBeNull();
+  });
+
+  it("draws an Ionicon the app lent by name with ion-icon, and the one it serves otherwise", async () => {
+    await core.open({});
+    expect(element.querySelector('[data-act="new"] [slot="icon-only"]').getAttribute("style")).toContain("./icon/add-outline.svg");
+    globalThis.Ionicons = { map: new Map([["add-outline", "data:image/svg+xml;utf8,<svg></svg>"]]) };
+    element.paintedLang = null;
+    element.paint();
+    expect(element.querySelector('[data-act="new"] ion-icon[slot="icon-only"]').getAttribute("name")).toBe("add-outline");
+  });
+});
+
+describe("the package", () => {
+  const dist = join(dirname(fileURLToPath(import.meta.url)), "dist");
+  const files = readdirSync(dist);
+
+  // Ionic is the app's, lent to the frame: a copy in the package would be a second one, and heavy.
+  it("carries no Ionic of its own", () => {
+    for (const file of files) {
+      const code = readFileSync(join(dist, file), "utf8");
+      expect(code, file).not.toMatch(/@ionic\/core|ionicframework|stencil|defineCustomElement|__registerHost/i);
+      expect(code, file).not.toMatch(/^\s*import\s.*from\s+["'](?!\.\/)/m);
+    }
+  });
+
+  // Small: it is plain code, no library.
+  it("stays under 128 KiB", () => {
+    const bytes = files.reduce((sum, file) => sum + statSync(join(dist, file)).size, 0);
+    expect(bytes).toBeLessThanOrEqual(128 * 1024);
   });
 });
 
