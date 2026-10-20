@@ -174,6 +174,9 @@ const smallIcon = (name) => `<i class="i small" style="--i:url(./icon/${name}.sv
 /** An Ionic button with an icon only. */
 const button = (act, label, name, extra = "") =>
   `<ion-button ${/\bfill=/.test(extra) ? "" : 'fill="clear"'} data-act="${act}" aria-label="${escape(label)}" ${extra}>${icon(name)}</ion-button>`;
+/** A filled button, in the app's primary colour. The colour is named because Ionic fills a button
+ *  with no colour in a toolbar with the toolbar's text colour (black in light, white in dark). */
+const FILLED = 'fill="solid" color="primary"';
 
 /** The plugin's view: a list of notes, one note, or the settings. */
 class Notes extends HTMLElement {
@@ -404,7 +407,7 @@ class Notes extends HTMLElement {
         <input type="search" name="query" placeholder="${escape(T("search"))}" aria-label="${escape(T("search"))}" value="${escape(this.query)}">
         <ion-buttons slot="end">
           ${button("settings", T("settings"), "options-outline")}
-          ${button("new", T("newNote"), "add-outline", 'fill="solid"')}
+          ${button("new", T("newNote"), "add-outline", FILLED)}
         </ion-buttons>
       </ion-toolbar></ion-header>
       <ion-content><div class="view">${body}</div></ion-content>`;
@@ -431,7 +434,7 @@ class Notes extends HTMLElement {
         <ion-buttons slot="start">${button("back", T("back"), "arrow-back-outline")}</ion-buttons>
         <ion-buttons slot="end">
           ${button("delete", T("delete"), "trash-outline", 'color="danger"')}
-          ${button("save", T("save"), "checkmark-outline", 'fill="solid"')}
+          ${button("save", T("save"), "checkmark-outline", FILLED)}
         </ion-buttons>
       </ion-toolbar></ion-header>
       <ion-content><div class="view">
