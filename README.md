@@ -35,6 +35,11 @@ que se ve como el resto de FlickerTalk. Sin ✕ propia: la tiene la ventana de l
 lleva Ionic: `@ionic/core` es solo `devDependency`, para que los tests pinten lo mismo que el
 teléfono.
 
+Desde la 1.0.4 los botones rellenos de la barra (nota nueva en la lista y guardar en una nota)
+llevan el color principal que la app presta al marco (`--ion-color-primary`). Antes salían negros
+con el tema claro y blancos con el oscuro: un `ion-button` relleno sin color dentro de un
+`ion-toolbar` toma el color del texto de la barra.
+
 ## Desarrollo
 
 ```sh

@@ -344,6 +344,31 @@ describe("the plugin", () => {
     expect(element.querySelector(':scope > ion-content ion-toggle[name="showText"]')).not.toBeNull();
   });
 
+  // Ionic paints a filled button in a toolbar with the toolbar's own text colour (black in light,
+  // white in dark) unless the button names a colour: the filled ones name the primary the app lends.
+  it("fills the buttons in its toolbars with the app's primary colour, not the toolbar's text colour", async () => {
+    // What Ionic has drawn: a filled button in a toolbar, and whether it carries a colour of its own.
+    const filled = async () => {
+      await tick();
+      return [...element.querySelectorAll("ion-button.button-solid.in-toolbar")].map((one) => ({
+        button: one.dataset.act,
+        color: one.getAttribute("color"),
+        own: one.classList.contains("ion-color-primary"),
+      }));
+    };
+    const primary = (button) => ({ button, color: "primary", own: true });
+
+    await core.open({});
+    expect(await filled()).toEqual([primary("new")]);
+
+    await press("new");
+    expect(await filled()).toEqual([primary("save")]);
+
+    await press("back");
+    await press("settings");
+    expect(await filled()).toEqual([]);
+  });
+
   it("draws an Ionicon the app lent by name with ion-icon, and the one it serves otherwise", async () => {
     await core.open({});
     expect(element.querySelector('[data-act="new"] [slot="icon-only"]').getAttribute("style")).toContain("./icon/add-outline.svg");
